@@ -3,11 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GitHub SSH + Repo Workflow</title>
+<title>GitHub Dual Account SSH + Signing Guide</title>
+
+<meta name="title" content="GitHub Dual Account SSH Setup">
+<meta name="description" content="Minimal command reference for running two GitHub accounts with SSH authentication and verified commit signing.">
+<meta name="author" content="ObiquitousParakeet">
+
+<meta property="og:title" content="GitHub Dual Account SSH + Signing">
+<meta property="og:description" content="Clean SSH workflow for multiple GitHub identities.">
+<meta property="og:type" content="website">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
+<rect width='64' height='64' fill='black'/>
+<circle cx='32' cy='32' r='18' stroke='lime' stroke-width='4' fill='none'/>
+<circle cx='32' cy='32' r='6' fill='lime'/>
+</svg>">
 
 <style>
 body{margin:0;font-family:monospace;background:#020409;color:#00ff9c;line-height:1.6}
-.container{max-width:1100px;margin:auto;padding:30px}
+.container{max-width:1100px;margin:auto;padding:40px}
 h1{text-shadow:0 0 10px #00ff9c}
 
 .nav{display:flex;gap:10px;margin-bottom:20px}
@@ -17,15 +32,20 @@ h1{text-shadow:0 0 10px #00ff9c}
 .section{display:none}
 .section.active{display:block}
 
-.card{background:#050a12;border:1px solid #00ff9c22;padding:20px;margin-top:20px;border-radius:10px}
+.card{background:#050a12;border:1px solid #00ff9c22;padding:24px;margin-top:20px;border-radius:10px;box-shadow:0 0 20px #00ff9c11}
 
-.codeblock{position:relative;margin-top:12px}
-pre{background:#000;padding:12px;border-radius:6px;border:1px solid #00ff9c22;margin:0;white-space:pre-wrap}
+.codeblock{position:relative;margin-top:14px}
+pre{background:#000;padding:14px;border-radius:6px;border:1px solid #00ff9c22;margin:0;overflow:auto}
 
 .copybtn{position:absolute;top:6px;right:6px;background:#001f18;color:#00ff9c;border:1px solid #00ff9c55;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:12px}
 .copybtn:hover{background:#003b2b}
 
 .note{font-size:13px;opacity:.8;margin-top:8px}
+.rain{position:absolute;inset:0;pointer-events:none;opacity:.6}
+
+footer{margin-top:80px;padding-top:20px;border-top:1px solid #00ff9c22;font-size:14px;opacity:.8}
+.repo{color:#00ffd0;text-decoration:none}
+.repo:hover{text-shadow:0 0 6px #00ffd0}
 </style>
 </head>
 <body>
@@ -33,6 +53,7 @@ pre{background:#000;padding:12px;border-radius:6px;border:1px solid #00ff9c22;ma
 <div class="container">
 
 <h1>GitHub SSH + Repo Workflow</h1>
+<p>Minimal command reference for running two GitHub accounts with verified commits.</p>
 
 <div class="nav">
 <button class="tab active" data-tab="ssh">SSH</button>
@@ -43,26 +64,45 @@ pre{background:#000;padding:12px;border-radius:6px;border:1px solid #00ff9c22;ma
 <div class="section active" id="ssh">
 
 <div class="card">
-<h2>Global Account</h2>
+<h2>1. Primary Account (Global Setup)</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config --global user.name "YourPrimaryUser"</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config --global user.email "YOUR_GITHUB_ID+YourPrimaryUser@users.noreply.github.com"</pre></div>
-<div class="note">Replace YOUR_GITHUB_ID with your numeric GitHub ID.</div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config --global gpg.format ssh</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config --global commit.gpgsign true</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git config --global tag.gpgsign true</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config --global user.signingkey ~/.ssh/id_ed25519.pub</pre></div>
 </div>
 
 <div class="card">
-<h2>Secondary Repo Account</h2>
+<h2>2. Secondary Account (Per Repository)</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config user.name "YourSecondUser"</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config user.email "YOUR_GITHUB_ID+YourSecondUser@users.noreply.github.com"</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config user.signingkey ~/.ssh/id_ed25519_second.pub</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git config gpg.format ssh</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config commit.gpgsign true</pre></div>
 </div>
 
 <div class="card">
-<h2>Auth</h2>
+<h2>3. SSH Remote</h2>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git remote add origin git@github.com:YourUser/your-repository.git</pre></div>
+</div>
+
+<div class="card">
+<h2>4. GitHub CLI Authentication</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>gh auth login</pre></div>
+<p>Choose SSH when prompted.</p>
+</div>
+
+<div class="card">
+<h2>5. Repo Overrides Global Config</h2>
+<div class="codeblock"><button class="copybtn">copy</button><pre>.git/config</pre></div>
+</div>
+
+<div class="card">
+<h2>6. Debug</h2>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git config --list --show-origin</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git log -1 --show-signature</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>ssh -T git@github.com</pre></div>
 </div>
 
 </div>
@@ -71,41 +111,37 @@ pre{background:#000;padding:12px;border-radius:6px;border:1px solid #00ff9c22;ma
 <div class="section" id="repo">
 
 <div class="card">
-<h2>1. Create Project Folder (explicit)</h2>
+<h2>1. Create Project Folder</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>mkdir my-project
 cd my-project</pre></div>
-<div class="note">Replace <b>my-project</b> with your desired root directory name.</div>
 </div>
 
 <div class="card">
-<h2>2. Init + First Commit (explicit)</h2>
+<h2>2. Init Project</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git init
 git add .
 git commit -m "initial commit"</pre></div>
 </div>
 
 <div class="card">
-<h2>3. Create Remote Repo (clear usage)</h2>
+<h2>3. Create Remote</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>gh repo create my-project \
-  --source=. \
-  --remote=origin \
-  --private \
-  --push</pre></div>
-<div class="note">The repo name <b>must match your folder</b> unless you intentionally change it.</div>
+--source=. \
+--remote=origin \
+--private \
+--push</pre></div>
 </div>
 
 <div class="card">
-<h2>Repo Templates (Starter via CLI)</h2>
+<h2>Template Repo</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>gh repo create my-project \
-  --template owner/template-repo \
-  --private</pre></div>
-<div class="note">Clones a template into a new repo instantly.</div>
+--template owner/template-repo \
+--private</pre></div>
 </div>
 
 <div class="card">
-<h2>One-Command Full Init (macro)</h2>
+<h2>One-Line Full Init</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>mkdir my-project && cd my-project && git init && git add . && git commit -m "initial commit" && gh repo create my-project --source=. --remote=origin --private --push</pre></div>
-<div class="note">Runs full flow in one line. Replace <b>my-project</b> once — used everywhere.</div>
 </div>
 
 <div class="card">
@@ -116,20 +152,21 @@ git push -u origin main</pre></div>
 </div>
 
 <div class="card">
-<h2>Daily Workflow</h2>
+<h2>Daily</h2>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git add .
 git commit -m "update"
 git push</pre></div>
 </div>
 
-<div class="card">
-<h2>Debug</h2>
-<div class="codeblock"><button class="copybtn">copy</button><pre>git config --list --show-origin</pre></div>
-<div class="codeblock"><button class="copybtn">copy</button><pre>git log -1 --show-signature</pre></div>
-<div class="codeblock"><button class="copybtn">copy</button><pre>ssh -T git@github.com</pre></div>
 </div>
 
-</div>
+<footer>
+<p>
+Made by <strong>ObiquitousParakeet</strong><br>
+Project Repository:
+<a class="repo" href="https://github.com/ObiquitousParakeet/github-ssh-dual-identity-guide">github.com/ObiquitousParakeet/github-ssh-dual-identity-guide</a>
+</p>
+</footer>
 
 </div>
 
@@ -151,11 +188,37 @@ const buttons=document.querySelectorAll('.copybtn')
 buttons.forEach(btn=>{
  btn.onclick=async()=>{
   const code=btn.nextElementSibling.innerText.trim()
-  await navigator.clipboard.writeText(code)
-  btn.innerText='copied'
-  setTimeout(()=>btn.innerText='copy',1000)
+  let copied=false
+  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(code);copied=true}}catch{}
+  if(!copied){
+   const ta=document.createElement('textarea');ta.value=code;document.body.appendChild(ta);ta.select();
+   try{document.execCommand('copy');copied=true}catch{}
+   document.body.removeChild(ta)
+  }
+  btn.innerText=copied?'copied':'failed'
+  matrixRain(btn.parentElement)
+  setTimeout(()=>btn.innerText='copy',1500)
  }
 })
+
+function matrixRain(el){
+ const c=document.createElement('canvas');c.className='rain';el.appendChild(c)
+ const ctx=c.getContext('2d');c.width=el.offsetWidth;c.height=el.offsetHeight
+ const letters='01';const font=12;const cols=Math.floor(c.width/font);const drops=[]
+ for(let i=0;i<cols;i++)drops[i]=1
+ let frames=0
+ const int=setInterval(()=>{
+  ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(0,0,c.width,c.height)
+  ctx.fillStyle='#00ff9c';ctx.font=font+'px monospace'
+  for(let i=0;i<drops.length;i++){
+   const t=letters[Math.floor(Math.random()*letters.length)]
+   ctx.fillText(t,i*font,drops[i]*font)
+   if(drops[i]*font>c.height&&Math.random()>0.95)drops[i]=0
+   drops[i]++
+  }
+  frames++;if(frames>40){clearInterval(int);c.remove()}
+ },33)
+}
 
 </script>
 
