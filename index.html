@@ -99,7 +99,11 @@ footer{margin-top:80px;padding-top:20px;border-top:1px solid #00ff9c22;font-size
 </div>
 
 <div class="card">
-<h2>6. Debug</h2>
+<h2>6. Debug / Fix Signing</h2>
+<div class="codeblock"><button class="copybtn">copy</button><pre>ssh-add -l</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>ssh-add ~/.ssh/id_ed25519</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git config --global --get user.signingkey</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git commit -S --allow-empty -m "sign test"</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git config --list --show-origin</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>git log -1 --show-signature</pre></div>
 <div class="codeblock"><button class="copybtn">copy</button><pre>ssh -T git@github.com</pre></div>
@@ -117,19 +121,21 @@ cd my-project</pre></div>
 </div>
 
 <div class="card">
-<h2>2. Init Project</h2>
-<div class="codeblock"><button class="copybtn">copy</button><pre>git init
-git add .
-git commit -m "initial commit"</pre></div>
+<h2>2. Init Project (safe signing)</h2>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git init</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git add .</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git commit -m "initial commit" --no-gpg-sign</pre></div>
+<div class="note">Prevents "failed to find public key" during first commit if SSH signing agent isn't loaded yet.</div>
+</div>
 </div>
 
 <div class="card">
-<h2>3. Create Remote</h2>
-<div class="codeblock"><button class="copybtn">copy</button><pre>gh repo create my-project \
---source=. \
---remote=origin \
---private \
---push</pre></div>
+<h2>3. Create Remote (correct + reliable)</h2>
+<div class="codeblock"><button class="copybtn">copy</button><pre>gh repo create my-project --private --confirm</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git remote add origin git@github.com:YourUser/my-project.git</pre></div>
+<div class="codeblock"><button class="copybtn">copy</button><pre>git push -u origin main</pre></div>
+<div class="note">More reliable than --source/--push flow. Avoids signing + key resolution issues during initial commit.</div>
+</div>
 </div>
 
 <div class="card">
@@ -140,8 +146,10 @@ git commit -m "initial commit"</pre></div>
 </div>
 
 <div class="card">
-<h2>One-Line Full Init</h2>
-<div class="codeblock"><button class="copybtn">copy</button><pre>mkdir my-project && cd my-project && git init && git add . && git commit -m "initial commit" && gh repo create my-project --source=. --remote=origin --private --push</pre></div>
+<h2>One-Line Full Init (stable)</h2>
+<div class="codeblock"><button class="copybtn">copy</button><pre>mkdir my-project && cd my-project && git init && git add . && git commit -m "initial commit" --no-gpg-sign && gh repo create my-project --private --confirm && git remote add origin git@github.com:YourUser/my-project.git && git push -u origin main</pre></div>
+<div class="note">Avoids CLI auto-push + signing race conditions.</div>
+</div>
 </div>
 
 <div class="card">
